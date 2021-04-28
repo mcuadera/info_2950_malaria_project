@@ -10,131 +10,161 @@ plt.rcParams["figure.figsize"] = (10, 5)
 
 
 curated_df_url = "https://raw.githubusercontent.com/mcuadera/info_2950_malaria_project/main/datasets/malaria_project_curated_data.csv"
-malaria_df = pd.read_csv(curated_df_url)
-malaria_df['Year Only'] = malaria_df['Year'].datetime.year
-malaria_df = malaria_df.set_index('Year Only')
+malaria_df = pd.read_csv(curated_df_url, index_col=0, parse_dates=True)
 malaria_df.head()
 
 
-plt.plot(malaria_df['Incidence'].mean())
-plt.show()
+by_year = malaria_df.groupby('Year')
+year_2013 = malaria_df.loc['2013-01-01']
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-by_year = malaria_df.groupby("Year")
-
-
-plt.plot(by_year["Deaths"].mean(), label="Mean")
-plt.plot(by_year["Deaths"].median(), label="Median")
-plt.title("Deaths per Year")
-plt.xlabel("Year")
-plt.xticks(rotation = 40)
-plt.ylabel("Deaths")
+plt.plot(by_year['Confirmed Cases'].mean(), label='Mean')
+plt.plot(by_year['Confirmed Cases'].median(), label='Median')
+plt.title('Global Malaria Confirmed Cases Over Time (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('No. of Confirmed Cases')
 plt.legend()
 plt.show()
 
 
-plt.plot(by_year["Deaths"].median(), color="orange")
-plt.title("Median Deaths per Year")
-plt.xlabel("Year")
-plt.xticks(rotation = 40)
-plt.ylabel("Median Deaths")
+plt.plot(by_year['Confirmed Cases'].median(), color='orange')
+plt.title('Median Global Malaria Confirmed Cases Over Time (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('No. of Confirmed Cases')
 plt.show()
 
 
-by_region = malaria_df.groupby(["Region","Year"])
-
-
-by_region.mean()["Deaths"].unstack().plot(kind="bar")
-plt.title("Average Deaths per Region (2000-2013)")
-plt.xlabel("Region")
-plt.xticks(rotation=40)
-plt.ylabel("Average Deaths")
-plt.legend(loc='upper center', bbox_to_anchor=(1.5, 0.8), shadow=True, ncol=4)
-plt.show()
-
-
-by_region.median()["Deaths"].unstack().plot(kind="bar")
-plt.title("Median Deaths per Region (2000-2013)")
-plt.xlabel("Region")
-plt.xticks()
-plt.ylabel("Median Deaths")
-plt.legend(loc='upper center', bbox_to_anchor=(1.5, 0.8), shadow=True, ncol=4)
-plt.show()
-
-
-africa = malaria_df[malaria_df["Region"]=="Africa"]
-
-
-africa_2013 = africa.loc["2013-01-01"]
-plt.bar(africa_2013["Country"], africa_2013["Deaths"])
-plt.title("Total Deaths per African Country 2013")
-plt.xlabel("Country")
-plt.xticks(rotation=90)
-plt.ylabel("Total Deaths")
-plt.show()
-
-
-africa_2000 = africa[africa["Year"]==2000]
-plt.bar(africa_2000["Country"], africa_2000["Deaths"])
-plt.title("Total Deaths per African Country 2000")
-plt.xlabel("Country")
-plt.xticks(rotation=90)
-plt.ylabel("Total Deaths")
-plt.show()
-
-
-angola = africa[africa["Country"]=="Angola"]
-kenya = africa[africa["Country"]=="Kenya"]
-plt.plot(angola["Year"], angola["Deaths"], label="Angola")
-plt.plot(kenya["Year"], kenya["Deaths"], label="Kenya")
-plt.title("Deaths per Year")
-plt.xlabel("Year")
-plt.xticks(rotation = 40)
-plt.ylabel("Deaths")
+sns.lineplot(x='Year', y='Confirmed Cases', hue='Region', data=malaria_df)
+plt.title('Global Malaria Confirmed Cases Over Time per Region (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('Average No. of Confirmed Cases (95% CI)')
 plt.legend()
 plt.show()
 
 
-year_region = malaria_df.groupby(["Year","Region"])
-year_region["Incidence"].mean().unstack().plot()
-plt.title("Average Incidence Per Year")
-plt.xlabel("Year")
-plt.ylabel("Incidence (cases per 1000 people)")
+sns.lineplot(x='Year', y='Confirmed Cases', hue='Region', data=malaria_df[malaria_df['Region']get_ipython().getoutput("='Africa'])")
+plt.title('Global Malaria Confirmed Cases Over Time per Region Excluding Africa (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('Average No. of Confirmed Cases (95% CI)')
+plt.legend()
 plt.show()
 
 
-year_region = malaria_df.groupby(["Year","Region"])
-year_region["Incidence"].median().unstack().plot()
-plt.title("Median Incidence Per Year")
-plt.xlabel("Year")
-plt.ylabel("Incidence (cases per 1000 people)")
+plt.plot(by_year['Incidence'].mean(), label='Mean')
+plt.plot(by_year['Incidence'].median(), label='Median')
+plt.title('Global Malaria Incidence Over Time (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('Incidence (per 1,000 population)')
+plt.legend()
 plt.show()
 
 
-malaria_corr_matrix = malaria_df.corr()
-sns.heatmap(malaria_corr_matrix, cmap="YlGnBu", annot=True)
+plt.plot(by_year['Incidence'].median(), color='orange')
+plt.title('Median Global Malaria Incidence Over Time (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('Incidence (per 1,000 population)')
 plt.show()
 
 
-plt.scatter(malaria_df["Confirmed Cases"], malaria_df['Deaths'])
-plt.title("Malaria Deaths vs Confirmed Cases of Malaria")
-plt.xlabel("Confirmed Cases")
-plt.ylabel("Deaths")
+sns.lineplot(x='Year', y='Incidence', hue='Region', data=malaria_df)
+plt.title('Global Malaria Incidence Over Time per Region (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('Average Incidence (per 1,000 population) (95% CI)')
+plt.legend()
+plt.show()
+
+
+sns.lineplot(x='Year', y='Incidence', hue='Region', data=malaria_df[malaria_df['Region']get_ipython().getoutput("='Africa'])")
+plt.title('Global Malaria Incidence Over Time per Region Excluding Africa (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('Average Incidence (per 1,000 population) (95% CI)')
+plt.legend()
+plt.show()
+
+
+plt.plot(by_year['Deaths'].mean(), label='Mean')
+plt.plot(by_year['Deaths'].median(), label='Median')
+plt.title('Global Malaria Deaths Over Time (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('No. of Confirmed Deaths')
+plt.legend()
+plt.show()
+
+
+plt.plot(by_year['Deaths'].median(), color='orange')
+plt.title('Median Global Malaria Deaths Over Time (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('No. of Confirmed Deaths')
+plt.show()
+
+
+sns.lineplot(x='Year', y='Deaths', hue='Region', data=malaria_df)
+plt.title('Global Malaria Confirmed Deaths Over Time per Region (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('Average No. of Confirmed Deaths (95% CI)')
+plt.legend()
+plt.show()
+
+
+sns.lineplot(x='Year', y='Deaths', hue='Region', data=malaria_df[malaria_df['Region']get_ipython().getoutput("='Africa'])")
+plt.title('Global Malaria Confirmed Deaths Over Time per Region Excluding Africa (2000-2013)')
+plt.xlabel('Year')
+plt.ylabel('Average No. of Confirmed Deaths (95% CI)')
+plt.legend()
+plt.show()
+
+
+plt.hist(year_2013['Incidence'], bins=30)
+plt.title('Distribution of Malaria Incidence (2013)')
+plt.xlabel('Incidence (per 1,000 people)')
+plt.ylabel('Count')
+plt.show()
+
+
+sns.boxplot(x='Region', y='Incidence', data=year_2013)
+sns.stripplot(x='Region', y='Incidence', data=year_2013, color='black', alpha=0.6)
+plt.title('Incidence per Global Region (2013)')
+plt.xlabel('Global Region')
+plt.ylabel('Incidence (per 1,000 population)')
+plt.show()
+
+
+sns.boxplot(x='Global South', y='Incidence', data=year_2013)
+sns.stripplot(x='Global South', y='Incidence', data=year_2013, color='black', alpha=0.6)
+plt.title('Incidence per Development Status (2013)')
+plt.xlabel('Development Status')
+plt.ylabel('Incidence (per 1,000 population)')
+plt.show()
+
+
+plt.hist(year_2013['Deaths'], bins=30)
+plt.title('Distribution of Malaria Deaths (2013)')
+plt.xlabel('No. of Deaths')
+plt.ylabel('Count')
+plt.show()
+
+
+sns.boxplot(x='Region', y='Deaths', data=year_2013)
+sns.stripplot(x='Region', y='Deaths', data=year_2013, color='black', alpha=0.6)
+plt.title('Confirmed Deaths per Global Region (2013)')
+plt.xlabel('Global Region')
+plt.ylabel('Confirmed Deaths')
+plt.show()
+
+
+sns.boxplot(x='Region', y='Deaths', data=year_2013[year_2013['Region']get_ipython().getoutput("='Africa'])")
+sns.stripplot(x='Region', y='Deaths', data=year_2013[year_2013['Region']get_ipython().getoutput("='Africa'], color='black', alpha=0.6)")
+plt.title('Confirmed Deaths per Global Region excluding Africa (2013)')
+plt.xlabel('Global Region')
+plt.ylabel('No. of Confirmed Deaths')
+plt.show()
+
+
+sns.boxplot(x='Global South', y='Deaths', data=year_2013)
+sns.stripplot(x='Global South', y='Deaths', data=year_2013, color='black', alpha=0.6)
+plt.title('Confirmed Deaths per Development Status (2013)')
+plt.xlabel('Development Status')
+plt.ylabel('No. of Deaths')
 plt.show()
 
 
@@ -179,6 +209,12 @@ incidence_model_pooled_coeff = incidence_model_pooled.coef_[:]
 
 for i in range(len(incidence_model_pooled_coeff)):
     print('For', incidence_model_vars[i], 'variable, the regression coefficient is: {:.2f}'.format(incidence_model_pooled_coeff[i]))
+
+
+
+
+
+
 
 
 
