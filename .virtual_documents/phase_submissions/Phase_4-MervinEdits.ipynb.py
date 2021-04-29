@@ -4,12 +4,8 @@ import matplotlib.pyplot as plt
 import datetime
 import requests
 from scipy import stats
-import statsmodels.api as sm
-from statsmodels.formula.api import ols
 import seaborn as sns
 from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.cluster import KMeans
-
 plt.rcParams["figure.figsize"] = (10, 5)
 
 
@@ -172,73 +168,6 @@ plt.ylabel('No. of Deaths')
 plt.show()
 
 
-malaria_df["Confirmed Cases"].plot(kind="hist")
-plt.title("Confirmed Cases of Malaria")
-plt.xlabel("Confirmed Cases")
-plt.ylabel("Count")
-
-
-sns.boxplot(x = year_2013["Region"], y = year_2013["Confirmed Cases"])
-sns.stripplot(x=year_2013["Region"],y= year_2013["Confirmed Cases"], data=year_2013, color="black", alpha=0.4)
-plt.xlabel("Region")
-plt.ylabel("Confirmed Cases")
-plt.title("Confirmed Cases per Region")
-plt.show()
-
-
-sns.boxplot(x = year_2013["Global South"], y = year_2013["Confirmed Cases"])
-sns.stripplot(x=year_2013["Global South"],y= year_2013["Confirmed Cases"], data=year_2013, color="black", alpha=0.4)
-plt.xlabel("Development Status")
-plt.ylabel("Confirmed Cases")
-plt.title("Confirmed Cases per Development Status")
-plt.show()
-
-
-sns.lineplot(x = malaria_df.index, y=malaria_df["AverageTemperature"], hue='Region', data=malaria_df, ci=None)
-plt.title('Average Temperatures Over Time per Region (2000-2013)')
-plt.xlabel('Year')
-plt.ylabel('Average Temperature (Celsius)')
-plt.legend()
-plt.show()
-
-
-sns.lineplot(x = malaria_df.index, y=malaria_df["AverageTemperature"], data=malaria_df)
-plt.title('Average Temperatures Over Time(2000-2013)')
-plt.xlabel('Year')
-plt.ylabel('Average Temperature (Celsius)')
-plt.show()
-
-
-year_2013["GDPpcPPP"].plot(kind="hist")
-plt.title("GDP Per Capita PPP")
-plt.xlabel("GDP Per Capita PPP")
-plt.ylabel("Count")
-plt.show()
-
-
-sns.boxplot(x = year_2013["Global South"], y = year_2013["GDPpcPPP"])
-sns.stripplot(x=year_2013["Global South"],y= year_2013["GDPpcPPP"], data=year_2013, color="black", alpha=0.4)
-plt.xlabel("Development Status")
-plt.ylabel("GDP Per Capita PPP")
-plt.title("GDP Per Capita PPP by Development Status")
-plt.show()
-
-
-sns.boxplot(x = year_2013["Region"], y = year_2013["GDPpcPPP"])
-sns.stripplot(x=year_2013["Region"],y= year_2013["GDPpcPPP"], data=year_2013, color="black", alpha=0.4)
-plt.xlabel("Region")
-plt.ylabel("GDP Per Capita PPP")
-plt.title("GDP Per Capita PPP by Development Status by Region")
-plt.show()
-
-
-plt.scatter(year_2013["GDPpcPPP"], year_2013["Incidence"])
-plt.xlabel("GDP Per Capita PPP")
-plt.ylabel("Incidence")
-plt.title("GDP Per Capita PPP vs Malaria Incidence")
-plt.show()
-
-
 #Generating dummy variables for regions
 subset_2013 = malaria_df.loc["2013-01-01"].copy()
 subset_2013["Is Asia & Pacific"] = pd.get_dummies(subset_2013["Region"])["Asia & Pacific"]
@@ -282,25 +211,25 @@ for i in range(len(incidence_model_pooled_coeff)):
     print('For', incidence_model_vars[i], 'variable, the regression coefficient is: {:.2f}'.format(incidence_model_pooled_coeff[i]))
 
 
-twoCols = year_2013[["GDPpcPPP", "Incidence"]]
-twoCols = twoCols.dropna(axis=0)
-kmeans = KMeans(n_clusters = 3)
-y_kmeans = kmeans.fit(twoCols)
-
-centers = kmeans.cluster_centers_
-plt.scatter(year_2013["GDPpcPPP"], year_2013["Incidence"])
-plt.scatter(centers[:, 0], centers[:, 1], c='black')
-
-plt.xlabel("GDP pc PPP")
-plt.ylabel("Malaria Incidence")
-plt.show()
 
 
-incidence_region_model = ols('Incidence ~ Region', data=year_2013).fit()
-aov_table = sm.stats.anova_lm(incidence_region_model)
-print(aov_table)
 
 
-incidence_region_model = ols('Incidence ~ Region', data=year_2013[year_2013['Region']get_ipython().getoutput("='Africa']).fit()")
-aov_table = sm.stats.anova_lm(incidence_region_model)
-print(aov_table)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
