@@ -165,7 +165,6 @@ malaria_df["Confirmed Cases"].plot(kind="hist")
 plt.title("Confirmed Cases of Malaria")
 plt.xlabel("Confirmed Cases")
 plt.ylabel("Count")
-plt.show()
 
 
 sns.boxplot(x = year_2013["Region"], y = year_2013["Confirmed Cases"])
@@ -180,6 +179,7 @@ sns.stripplot(x=year_2013["Global South"],y= year_2013["Confirmed Cases"], data=
 plt.xlabel("Development Status")
 plt.ylabel("Confirmed Cases")
 plt.title("Confirmed Cases per Development Status")
+plt.show()
 
 
 sns.lineplot(x = malaria_df.index, y=malaria_df["AverageTemperature"], hue='Region', data=malaria_df, ci=None)
