@@ -304,9 +304,3 @@ print(aov_table)
 incidence_region_model = ols('Incidence ~ Region', data=year_2013[year_2013['Region']get_ipython().getoutput("='Africa']).fit()")
 aov_table = sm.stats.anova_lm(incidence_region_model)
 print(aov_table)
-
-
-
-
-
-
