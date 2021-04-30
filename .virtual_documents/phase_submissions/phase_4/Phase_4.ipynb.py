@@ -186,8 +186,16 @@ plt.title("Confirmed Cases per Region")
 plt.show()
 
 
-sns.boxplot(x = year_2013["Global South"], y = year_2013["Confirmed Cases"])
-sns.stripplot(x=year_2013["Global South"],y= year_2013["Confirmed Cases"], data=year_2013, color="black", alpha=0.4)
+sns.boxplot(x="Region", y ="Confirmed Cases", data=year_2013[year_2013['Region']get_ipython().getoutput("='Africa'])")
+sns.stripplot(x="Region", y ="Confirmed Cases", data=year_2013[year_2013['Region']get_ipython().getoutput("='Africa'], color="black", alpha=0.4)")
+plt.xlabel("Region")
+plt.ylabel("Confirmed Cases")
+plt.title("Confirmed Cases per Region (excluding Africa)")
+plt.show()
+
+
+sns.boxplot(x=year_2013["Global South"], y=year_2013["Confirmed Cases"])
+sns.stripplot(x=year_2013["Global South"], y=year_2013["Confirmed Cases"], data=year_2013, color="black", alpha=0.4)
 plt.xlabel("Development Status")
 plt.ylabel("Confirmed Cases")
 plt.title("Confirmed Cases per Development Status")
@@ -284,11 +292,11 @@ for i in range(len(incidence_model_pooled_coeff)):
 
 twoCols = year_2013[["GDPpcPPP", "Incidence"]]
 twoCols = twoCols.dropna(axis=0)
-kmeans = KMeans(n_clusters = 3)
+kmeans = KMeans(n_clusters=6)
 y_kmeans = kmeans.fit(twoCols)
 
 centers = kmeans.cluster_centers_
-plt.scatter(year_2013["GDPpcPPP"], year_2013["Incidence"])
+sns.scatterplot(x="GDPpcPPP", y="Incidence", hue="Region", data=year_2013)
 plt.scatter(centers[:, 0], centers[:, 1], c='black')
 
 plt.xlabel("GDP pc PPP")
