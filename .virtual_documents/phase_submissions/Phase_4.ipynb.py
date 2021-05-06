@@ -236,11 +236,11 @@ sns.boxplot(x = year_2013["Region"], y = year_2013["GDPpcPPP"])
 sns.stripplot(x=year_2013["Region"],y= year_2013["GDPpcPPP"], data=year_2013, color="black", alpha=0.4)
 plt.xlabel("Region")
 plt.ylabel("GDP Per Capita PPP")
-plt.title("GDP Per Capita PPP by Development Status by Region")
+plt.title("GDP Per Capita PPP by Region")
 plt.show()
 
 
-plt.scatter(year_2013["GDPpcPPP"], year_2013["Incidence"])
+sns.scatterplot(x="GDPpcPPP", y="Incidence", hue="Region", data=malaria_df)
 plt.xlabel("GDP Per Capita PPP")
 plt.ylabel("Incidence")
 plt.title("GDP Per Capita PPP vs Malaria Incidence")
@@ -266,6 +266,8 @@ subset_2013 = subset_2013.dropna(subset = incidence_model_vars).copy() # making 
 incidence_model_2013 = LinearRegression()
 incidence_model_2013.fit(subset_2013[incidence_model_vars], subset_2013["Incidence"])
 incidence_model_2013_coeff = incidence_model_2013.coef_[:]
+multi_nom_reg_r2 = incidence_model_2013.score(subset_2013[incidence_model_vars], subset_2013["Incidence"])
+print('The r^2 of the multivariate model is: {:.2f}'.format(multi_nom_reg_r2))
 
 
 for i in range(len(incidence_model_2013_coeff)):
@@ -290,13 +292,13 @@ for i in range(len(incidence_model_pooled_coeff)):
     print('For', incidence_model_vars[i], 'variable, the regression coefficient is: {:.2f}'.format(incidence_model_pooled_coeff[i]))
 
 
-twoCols = year_2013[["GDPpcPPP", "Incidence"]]
+twoCols = malaria_df[["GDPpcPPP", "Incidence"]]
 twoCols = twoCols.dropna(axis=0)
 kmeans = KMeans(n_clusters=6)
 y_kmeans = kmeans.fit(twoCols)
 
 centers = kmeans.cluster_centers_
-sns.scatterplot(x="GDPpcPPP", y="Incidence", hue="Region", data=year_2013)
+sns.scatterplot(x="GDPpcPPP", y="Incidence", hue="Region", data=malaria_df)
 plt.scatter(centers[:, 0], centers[:, 1], c='black')
 
 plt.xlabel("GDP pc PPP")
