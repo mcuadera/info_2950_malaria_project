@@ -7,8 +7,11 @@ from scipy import stats
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import seaborn as sns
+from sklearn import preprocessing
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, accuracy_score
 
 plt.rcParams["figure.figsize"] = (10, 5)
 
@@ -116,6 +119,9 @@ plt.xlabel('Year')
 plt.ylabel('Average No. of Confirmed Deaths (95% CI)')
 plt.legend()
 plt.show()
+
+
+year_2013.groupby('Region').mean().round(2)
 
 
 plt.hist(year_2013['Incidence'], bins=30)
@@ -247,49 +253,51 @@ plt.title("GDP Per Capita PPP vs Malaria Incidence")
 plt.show()
 
 
-#Generating dummy variables for regions
-subset_2013 = malaria_df.loc["2013-01-01"].copy()
-subset_2013["Is Asia & Pacific"] = pd.get_dummies(subset_2013["Region"])["Asia & Pacific"]
-subset_2013["Is Arab States"] = pd.get_dummies(subset_2013["Region"])["Arab States"]
-subset_2013["Is Africa"] = pd.get_dummies(subset_2013["Region"])["Africa"]
-subset_2013["Is South/Latin America"] = pd.get_dummies(subset_2013["Region"])["South/Latin America"]
-subset_2013["Is Europe"] = pd.get_dummies(subset_2013["Region"])["Europe"]
-subset_2013["Is Middle east"] = pd.get_dummies(subset_2013["Region"])["Middle east"]
+regions = pd.get_dummies(malaria_df['Region']) # generating dummy variables for regions
+malaria_df = pd.concat([malaria_df, regions], axis=1).copy()
 
-
-incidence_model_vars = ["Is Asia & Pacific", "Is Arab States", "Is Africa",
-                        "Is South/Latin America", "Is Europe", "Is Middle east",
+incidence_model_vars = ["Asia & Pacific", "Arab States", "Africa",
+                        "South/Latin America", "Europe", "Middle east",
                         "AverageTemperature", "GDPpcPPP"]
 
-subset_2013 = subset_2013.dropna(subset = incidence_model_vars).copy() # making sure there are no NA values
-
-incidence_model_2013 = LinearRegression()
-incidence_model_2013.fit(subset_2013[incidence_model_vars], subset_2013["Incidence"])
-incidence_model_2013_coeff = incidence_model_2013.coef_[:]
-multi_nom_reg_r2 = incidence_model_2013.score(subset_2013[incidence_model_vars], subset_2013["Incidence"])
-print('The r^2 of the multivariate model is: {:.2f}'.format(multi_nom_reg_r2))
-
-
-for i in range(len(incidence_model_2013_coeff)):
-    print('For', incidence_model_vars[i], 'variable, the regression coefficient is: {:.2f}'.format(incidence_model_2013_coeff[i]))
+malaria_df_no_na = malaria_df.dropna(subset = incidence_model_vars).copy() # making sure there are no NA values
+malaria_df_no_na.head()
+print('Without dropping any NAs, there are {} columns'.format(malaria_df.shape[0]))
+print('After dropping NAs for each of the variables of interest,there are {} columns'.
+      format(malaria_df_no_na.shape[0]))
+print('Dropping NAs did not significantly impact the number of variables in our dataset')
 
 
-malaria_df_dropna = malaria_df.copy()
-malaria_df_dropna["Is Asia & Pacific"] = pd.get_dummies(malaria_df_dropna["Region"])["Asia & Pacific"]
-malaria_df_dropna["Is Arab States"] = pd.get_dummies(malaria_df_dropna["Region"])["Arab States"]
-malaria_df_dropna["Is Africa"] = pd.get_dummies(malaria_df_dropna["Region"])["Africa"]
-malaria_df_dropna["Is South/Latin America"] = pd.get_dummies(malaria_df_dropna["Region"])["South/Latin America"]
-malaria_df_dropna["Is Europe"] = pd.get_dummies(malaria_df_dropna["Region"])["Europe"]
-malaria_df_dropna["Is Middle east"] = pd.get_dummies(malaria_df_dropna["Region"])["Middle east"]
-malaria_df_dropna = malaria_df_dropna.dropna(subset=incidence_model_vars).copy() # making sure there are no NA values
-
-incidence_model_pooled = LinearRegression()
-incidence_model_pooled.fit(malaria_df_dropna[incidence_model_vars], malaria_df_dropna["Incidence"])
-incidence_model_pooled_coeff = incidence_model_pooled.coef_[:]
+for i in incidence_model_vars:
+    linear_model = LinearRegression()
+    linear_model.fit(malaria_df_no_na[[i]], malaria_df_no_na['Incidence'])
+    b = linear_model.coef_[0]
+    r2 = linear_model.score(malaria_df_no_na[[i]], malaria_df_no_na['Incidence'])
+    
+    print("The predictor variable is:", i)
+    print("The slope of the model is: {:.2f}".format(b))
+    print("The r^2 of the model is: {:.2f} \n".format(r2))
 
 
-for i in range(len(incidence_model_pooled_coeff)):
-    print('For', incidence_model_vars[i], 'variable, the regression coefficient is: {:.2f}'.format(incidence_model_pooled_coeff[i]))
+X = malaria_df_no_na[incidence_model_vars]
+Y = malaria_df_no_na['Incidence']
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33, random_state=21)
+
+
+incidence_training_model = LinearRegression()
+incidence_training_model.fit(X_train, Y_train)
+incidence_training_model_coeff = incidence_training_model.coef_[:]
+print('The r^2 of the multivariate regression model using the training data is: {:.2f}'.
+      format(incidence_training_model.score(X_train, Y_train)))
+
+
+for i in range(len(incidence_training_model_coeff)):
+    print('For', incidence_model_vars[i], 'variable, the regression coefficient is: {:.2f}'.format(incidence_training_model_coeff[i]))
+
+
+incidence_prediction = incidence_training_model.predict(X_test)
+mae = mean_absolute_error(Y_test, incidence_prediction)
+print('The mean absolute error of our incidence model is: {:.2f}'.format(mae))
 
 
 twoCols = malaria_df[["GDPpcPPP", "Incidence"]]
@@ -304,6 +312,28 @@ plt.scatter(centers[:, 0], centers[:, 1], c='black')
 plt.xlabel("GDP pc PPP")
 plt.ylabel("Malaria Incidence")
 plt.show()
+
+
+le_region = preprocessing.LabelEncoder()
+malaria_df_no_na['Region Labelled'] = le_region.fit_transform(malaria_df_no_na['Region'])
+malaria_df_no_na.head()
+
+
+region_model_vars = ['GDPpcPPP', 'Incidence', 'AverageTemperature']
+X = malaria_df_no_na[region_model_vars]
+Y = malaria_df_no_na['Region Labelled']
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33, random_state=21)
+
+
+region_training_model = LogisticRegression(multi_class='multinomial', solver='saga', max_iter=2200).fit(X_train, Y_train)
+region_training_model_coeff = region_training_model.coef_[:]
+print('The r^2 of the multivariate regression model using the training data is: {:.2f}'.
+      format(region_training_model.score(X_train, Y_train)))
+
+
+region_predict = region_training_model.predict(X_test)
+accuracy = accuracy_score(Y_test, region_predict)
+print('Accuracy of the model: {:.2f}get_ipython().run_line_magic("'.format(accuracy*100))", "")
 
 
 incidence_region_model = ols('Incidence ~ Region', data=year_2013).fit()
