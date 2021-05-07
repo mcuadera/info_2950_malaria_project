@@ -170,6 +170,21 @@ plt.ylabel('No. of Confirmed Deaths')
 plt.show()
 
 
+year_2013.loc[year_2013['Region']=='Arab States'].sort_values(by='Deaths').tail(2)
+
+
+year_2013.loc[year_2013['Region']=='Asia & Pacific'].sort_values(by='Deaths').tail(5)
+
+
+
+
+
+year_2013.loc[year_2013['Region']=='South/Latin America'].sort_values(by='Deaths').tail(2)
+
+
+
+
+
 sns.boxplot(x='Global South', y='Deaths', data=year_2013)
 sns.stripplot(x='Global South', y='Deaths', data=year_2013, color='black', alpha=0.6)
 plt.title('Confirmed Deaths per Development Status (2013)')
